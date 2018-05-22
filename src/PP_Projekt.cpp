@@ -11,8 +11,11 @@
 #include <vector>
 #include <chrono>
 #include <ctime>
+#include <iostream>
+#include <sstream>
 
 #include "Room.h"
+#include "Order.h"
 
 
 using namespace std;
@@ -72,6 +75,23 @@ string loadRoomsFile() {
 	return buffer;
 }
 
+string loadOrdersFile() {
+
+	fstream ordersFile;
+	string buffer;
+
+	ordersFile.open("orders.txt");
+
+	if(ordersFile.is_open()) {
+
+		buffer.assign( (istreambuf_iterator<char>(ordersFile) ), (istreambuf_iterator<char>()));
+	}
+
+	ordersFile.close();
+
+	return buffer;
+}
+
 /*
  * GENERAL FUNCTION
  */
@@ -82,6 +102,7 @@ int main() {
 	int choosedOption; // stores option choosed from main menu
 
 	vector<Room> rooms; // vector for storing rooms data
+	vector<Order> orders; // vector for strong orders data
 
 
 	// display header
@@ -94,15 +115,19 @@ int main() {
 
 	// load all data from files
 	string roomsData = loadRoomsFile();
+	string ordersData = loadOrdersFile();
 
-	// convert raw data to objects
-	string delimiter_1 = ";";
-	string delimiter_2 = ",";
+	// setup delimiters
+	const string delimiter_1 = ";";
+	const string delimiter_2 = ",";
 	size_t pos = 0;
 
 	// used to store tokens
 	vector<string> roomTokens;
 
+	/**
+	 * rooms.txt to vectors
+	 */
 	// explode string loaded from file into separate objects in vector
 	while((pos = roomsData.find(delimiter_1)) != string::npos) {
 
@@ -123,6 +148,14 @@ int main() {
 		rooms.push_back(Room(stoi(tempRoomDetails[0]), stoi(tempRoomDetails[1]), tempRoomDetails[2], stoi(tempRoomDetails[3]), stoi(tempRoomDetails[4])));
 		tempRoomDetails.clear();
 	}
+
+	/**
+	 * orders.txt to vectors
+	 */
+	// explode string loaded from file into separate objects in vector
+	while((pos = ordersData.))
+
+
 
 	// start loop, makes it possible to go back
 	while(true) {
@@ -154,7 +187,20 @@ int main() {
 				break;
 			}
 			case 2:
+			{
+				// get date in format yyyy-mm-dd
+				time_t t = time(0);
+				tm* now = localtime(&t);
+
+				stringstream tempStream;
+				tempStream << (now->tm_year + 1900) << "-" << (now->tm_mon + 1) << "-" << now->tm_mday;
+
+				string formattedDate = tempStream.str();
+
+
+
 				break;
+			}
 			case 3:
 				break;
 			default:
