@@ -6,6 +6,8 @@
  */
 
 #include "Order.h"
+#include <string>
+#include <sstream>
 
 namespace std {
 
@@ -19,6 +21,14 @@ Order::Order(unsigned int orderId, unsigned int roomId, string date) {
 
 Order::~Order() {
 	// TODO Auto-generated destructor stub
+}
+
+const string Order::toString() const {
+	stringstream temp;
+
+	temp << "[" << orderId << ", " << roomId << ", " << date << "]";
+
+	return temp.str();
 }
 
 const string& Order::getDate() const {

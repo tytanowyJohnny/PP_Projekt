@@ -23,6 +23,7 @@ public:
 	void setOrderId(unsigned int orderId);
 	unsigned int getRoomId() const;
 	void setRoomId(unsigned int roomId);
+	const string toString() const;
 
 private:
 	// variables

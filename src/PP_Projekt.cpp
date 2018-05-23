@@ -48,7 +48,7 @@ int showMainMenu() {
 		// if not, clear cin
 		cin.clear();
 		cin.ignore(256, '\n');
-		cout << "You need to select from between available options." << endl;
+		cout << "You need to select from available options." << endl;
 		cout << "Please choose number from 1 to 3: ";
 		cin >> choosedOption;
 	}
@@ -92,6 +92,16 @@ string loadOrdersFile() {
 	return buffer;
 }
 
+void showRooms(const vector<Room>& rooms) {
+	// list rooms with prices
+	for (Room tempRoom : rooms) {
+		cout << tempRoom.getRoomId() << ". " << tempRoom.getRoomName()
+				<< " -> [" << tempRoom.getRoomCost() << "z³] - "
+				<< tempRoom.getRoomType() << ", " << tempRoom.getRoomSpace()
+				<< " os." << endl;
+	}
+}
+
 /*
  * GENERAL FUNCTION
  */
@@ -122,12 +132,13 @@ int main() {
 	const string delimiter_2 = ",";
 	size_t pos = 0;
 
-	// used to store tokens
-	vector<string> roomTokens;
-
 	/**
 	 * rooms.txt to vectors
 	 */
+
+	// used to store tokens
+	vector<string> roomTokens;
+
 	// explode string loaded from file into separate objects in vector
 	while((pos = roomsData.find(delimiter_1)) != string::npos) {
 
@@ -152,8 +163,30 @@ int main() {
 	/**
 	 * orders.txt to vectors
 	 */
+
+	// used to store tokens
+	vector<string> orderTokens;
+
 	// explode string loaded from file into separate objects in vector
-	while((pos = ordersData.))
+	while((pos = ordersData.find(delimiter_1)) != string::npos) {
+
+		orderTokens.push_back(ordersData.substr(0, pos));
+		ordersData.erase(0, pos + delimiter_1.length());
+	}
+
+	// used to store single order details
+	vector<string> tempOrderDetails;
+
+	for(string s: orderTokens) {
+
+		while((pos = s.find(delimiter_2)) != string::npos) {
+
+			tempOrderDetails.push_back(s.substr(0, pos));
+			s.erase(0, pos + delimiter_2.length());
+		}
+		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), tempOrderDetails[2]));
+		tempOrderDetails.clear();
+	}
 
 
 
@@ -176,18 +209,14 @@ int main() {
 				cout << "--------------------------------------------------" << endl;
 
 				// list rooms with prices
-				for(Room tempRoom : rooms) {
-
-					cout << tempRoom.getRoomId() << ". " << tempRoom.getRoomName() << " -> [" << tempRoom.getRoomCost() << "z³] - " << tempRoom.getRoomType() << ", " << tempRoom.getRoomSpace() << " os." << endl;
-				}
-
-				// go back to main menu
-				continue;
+				showRooms(rooms);
 
 				break;
 			}
 			case 2:
 			{
+				// vars
+				unsigned int choice;
 				// get date in format yyyy-mm-dd
 				time_t t = time(0);
 				tm* now = localtime(&t);
@@ -197,7 +226,23 @@ int main() {
 
 				string formattedDate = tempStream.str();
 
+				cout << "Choose which room you would like to order:" << endl;
+				cout << endl;
+				showRooms(rooms);
+				cout << endl;
+				cout << "Your choice: ";
+				cin >> choice;
 
+				// check if correct value
+				while(cin.fail() || choice > rooms.size()) {
+
+					// if not, clear cin
+					cin.clear();
+					cin.ignore(256, '\n');
+					cout << "You need to select from available options." << endl;
+					cout << "Your choice: ";
+					cin >> choice;
+				}
 
 				break;
 			}
