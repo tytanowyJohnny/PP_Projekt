@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 #include "Room.h"
 #include "Order.h"
@@ -102,6 +103,33 @@ void showRooms(const vector<Room>& rooms) {
 	}
 }
 
+void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
+
+	bool empty = true;
+	stringstream ss;
+	int counter = 1;
+
+	for(Order tempOrder : orders) {
+
+		if(tempOrder.getRoomId() == roomID) {
+
+			ss << counter << ". " << tempOrder.getDate() << "\n";
+
+			if(empty)
+				empty = false;
+		}
+	}
+
+	if(empty) { // there are no orders for this room
+
+		cout << "This room has not been booked any anyone yet!" << endl;
+
+	} else { // list already booked dates
+
+		cout << "This room is already unavailable at below time:" << endl;
+		cout << ss.str() << endl;
+	}
+}
 /*
  * GENERAL FUNCTION
  */
@@ -217,6 +245,8 @@ int main() {
 			{
 				// vars
 				unsigned int choice;
+				string orderDate;
+
 				// get date in format yyyy-mm-dd
 				time_t t = time(0);
 				tm* now = localtime(&t);
@@ -228,10 +258,13 @@ int main() {
 
 				cout << "Choose which room you would like to order:" << endl;
 				cout << endl;
+
+				// shows all rooms with already ordered dates
 				showRooms(rooms);
+
 				cout << endl;
-				cout << "Your choice: ";
-				cin >> choice;
+				cout << "Your choice (press 0 to go back): ";
+				cin >> choice; // save choice
 
 				// check if correct value
 				while(cin.fail() || choice > rooms.size()) {
@@ -240,9 +273,34 @@ int main() {
 					cin.clear();
 					cin.ignore(256, '\n');
 					cout << "You need to select from available options." << endl;
-					cout << "Your choice: ";
+					cout << "Your choice (press 0 to go back): ";
 					cin >> choice;
+
 				}
+
+				if(choice == 0) // handle going back to main menu
+					continue;
+
+				// show already booked dates for choosed room
+				cout << endl;
+				showRoomAvail(choice, orders);
+
+				// get date from user, format: yyyy-m-dd hh:mm
+				cout << endl;
+				cout << "Enter date to book a room [YYYY-M(M)-D(D) HH:MM]: ";
+				cin >> orderDate;
+				cout << endl;
+
+				// setup regex
+				regex date_match("[2][0][1][8-9]-([1][0-2]|[1-9])-([1-9]|[1-2][0-9]|[3][0-1])\\s([0-1][0-9]|[2][0-4]):([0-5][0-9]|[6][0])");
+
+				while(cin.fail() || !regex_match(orderDate, date_match)) {
+
+					cout << endl;
+					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D) HH:MM]: ";
+					cin >> orderDate;
+				}
+
 
 				break;
 			}
