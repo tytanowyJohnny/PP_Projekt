@@ -245,6 +245,7 @@ int main() {
 			{
 				// vars
 				unsigned int choice;
+				string startTime;
 				string orderDate;
 
 				// get date in format yyyy-mm-dd
@@ -304,9 +305,81 @@ int main() {
 					getline(cin, orderDate);
 				}
 
+				// get start hour
+				cout << endl;
+				cout << "At what time would you like to book a room? (8 - 16) [:15, :30, :45]: ";
+				cin >> startTime;
+
+				regex startTime_match("([8-9]|[1][0-6]):([0][0]|[1][5]|[3][0]|[4][5])");
+
+				while(cin.fail() || !regex_match(startTime, startTime_match)) {
+
+					cout << endl;
+					cout << "Invalid hour format, please try again: ";
+					cin >> startTime;
+				}
+
+
 				// get duration of booking
 				cout << endl;
-				c
+
+				cout << "Choose for how long you would like to book this room:" << endl;
+
+				cout << endl;
+
+				cout << "1. 30 minutes" << endl;
+				cout << "2. 1 hour (60 minutes)" << endl;
+				cout << "3. 1 hour 30 minutes (90 minutes)" << endl;
+				cout << "4. 2 hours (120 minutes)" << endl;
+				cout << "5. Custom length" << endl;
+
+				cout << endl;
+				cout << "Your choice: ";
+				cin >> choice;
+
+				while(cin.fail() || choice > 5 || choice == 0) {
+
+					cout << "You choosed incorrectly, please try again: ";
+					cin >> choice;
+				}
+
+
+				unsigned int bookingLength;
+
+				switch(choice) {
+
+					case 1:
+						bookingLength = 30;
+						break;
+					case 2:
+						bookingLength = 60;
+						break;
+					case 3:
+						bookingLength = 90;
+						break;
+					case 4:
+						bookingLength = 120;
+						break;
+					case 5:
+					{
+						cout << endl;
+						cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]): ";
+						cin >> bookingLength;
+
+						while(cin,fail() || bookingLength < 30 || bookingLength > 480 || bookingLength % 30 != 0) {
+
+							cout << endl;
+							cout << "Incorrect value, please try again: ";
+							cin >> bookingLength;
+						}
+						break;
+					}
+
+				}
+
+				// merge start hour with duration
+				string hour_delimiter = ":";
+
 
 
 
