@@ -288,18 +288,26 @@ int main() {
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
 				cout << "Enter date to book a room [YYYY-M(M)-D(D) HH:MM]: ";
-				cin >> orderDate;
+				cin.ignore();
+				getline(cin, orderDate);
 				cout << endl;
 
 				// setup regex
 				regex date_match("[2][0][1][8-9]-([1][0-2]|[1-9])-([1-9]|[1-2][0-9]|[3][0-1])\\s([0-1][0-9]|[2][0-4]):([0-5][0-9]|[6][0])");
 
+				// handle invalid input
 				while(cin.fail() || !regex_match(orderDate, date_match)) {
 
 					cout << endl;
 					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D) HH:MM]: ";
-					cin >> orderDate;
+					cin.ignore();
+					getline(cin, orderDate);
 				}
+
+				// get duration of booking
+				cout << endl;
+				c
+
 
 
 				break;
