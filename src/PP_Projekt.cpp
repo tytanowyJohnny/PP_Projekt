@@ -244,7 +244,7 @@ int main() {
 			case 2:
 			{
 				// vars
-				unsigned int choice;
+				unsigned int choosedRoom;
 				string startTime;
 				string orderDate;
 
@@ -265,49 +265,55 @@ int main() {
 
 				cout << endl;
 				cout << "Your choice (press 0 to go back): ";
-				cin >> choice; // save choice
+				cin >> choosedRoom; // save choice
 
 				// check if correct value
-				while(cin.fail() || choice > rooms.size()) {
+				while(cin.fail() || choosedRoom > rooms.size()) {
 
 					// if not, clear cin
 					cin.clear();
 					cin.ignore(256, '\n');
 					cout << "You need to select from available options." << endl;
 					cout << "Your choice (press 0 to go back): ";
-					cin >> choice;
+					cin >> choosedRoom;
 
 				}
 
-				if(choice == 0) // handle going back to main menu
+				if(choosedRoom == 0) // handle going back to main menu
 					continue;
 
 				// show already booked dates for choosed room
 				cout << endl;
-				showRoomAvail(choice, orders);
+				showRoomAvail(choosedRoom, orders);
 
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
-				cout << "Enter date to book a room [YYYY-M(M)-D(D) HH:MM]: ";
+				cout << "Enter date to book a room [YYYY-M(M)-D(D)]: ";
 				cin.ignore();
 				getline(cin, orderDate);
 				cout << endl;
 
+				// debug
+				cout << orderDate << endl;
+
 				// setup regex
-				regex date_match("[2][0][1][8-9]-([1][0-2]|[1-9])-([1-9]|[1-2][0-9]|[3][0-1])\\s([0-1][0-9]|[2][0-4]):([0-5][0-9]|[6][0])");
+				regex date_match("[2][0][1][8-9]-([1][0-2]|[1-9])-([1-9]|[1-2][0-9]|[3][0-1])");
 
 				// handle invalid input
 				while(cin.fail() || !regex_match(orderDate, date_match)) {
 
 					cout << endl;
-					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D) HH:MM]: ";
-					cin.ignore();
+					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D)]: ";
+
 					getline(cin, orderDate);
+
+					//debug
+					cout << orderDate << endl;
 				}
 
 				// get start hour
 				cout << endl;
-				cout << "At what time would you like to book a room? (8 - 16) [:15, :30, :45]: ";
+				cout << "At what time would you like to book a room? (8 - 16) [:00, :15, :30, :45]: ";
 				cin >> startTime;
 
 				regex startTime_match("([8-9]|[1][0-6]):([0][0]|[1][5]|[3][0]|[4][5])");
@@ -335,18 +341,18 @@ int main() {
 
 				cout << endl;
 				cout << "Your choice: ";
-				cin >> choice;
+				cin >> choosedRoom;
 
-				while(cin.fail() || choice > 5 || choice == 0) {
+				while(cin.fail() || choosedRoom > 5 || choosedRoom == 0) {
 
 					cout << "You choosed incorrectly, please try again: ";
-					cin >> choice;
+					cin >> choosedRoom;
 				}
 
 
 				unsigned int bookingLength;
 
-				switch(choice) {
+				switch(choosedRoom) {
 
 					case 1:
 						bookingLength = 30;
@@ -366,7 +372,7 @@ int main() {
 						cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]): ";
 						cin >> bookingLength;
 
-						while(cin,fail() || bookingLength < 30 || bookingLength > 480 || bookingLength % 30 != 0) {
+						while(cin.fail() || bookingLength < 30 || bookingLength > 480 || bookingLength % 30 != 0) {
 
 							cout << endl;
 							cout << "Incorrect value, please try again: ";
@@ -379,9 +385,23 @@ int main() {
 
 				// merge start hour with duration
 				string hour_delimiter = ":";
+				int tempHour;
+				int tempMinutes;
 
+				// extract hour and minutes
+				pos = startTime.find(hour_delimiter);
+				tempHour = stoi(startTime.substr(0, pos));
+				tempMinutes = stoi(startTime.substr(pos + hour_delimiter.length(), startTime.length()));
 
+				int totalMinutes = (tempHour * 60) + tempMinutes;
 
+				cout << "========================================" << endl;
+				cout << "ORDER SUMMARY" << endl;
+				cout << "========================================" << endl;
+
+				cout << endl;
+
+				// TODO: When creating vectors, push new item at position set by its ID from file
 
 				break;
 			}
