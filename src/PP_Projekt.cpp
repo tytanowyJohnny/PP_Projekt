@@ -58,6 +58,11 @@ int showMainMenu() {
 
 }
 
+/*
+ * Functions for loading data from files
+ */
+
+// Load rooms data
 string loadRoomsFile() {
 
 	fstream roomsFile;
@@ -76,6 +81,7 @@ string loadRoomsFile() {
 	return buffer;
 }
 
+// load orders data
 string loadOrdersFile() {
 
 	fstream ordersFile;
@@ -93,6 +99,12 @@ string loadOrdersFile() {
 	return buffer;
 }
 
+
+/*
+ * Other/helper functions
+ */
+
+// show all rooms in format "roomID. roomName -> [roomCost z³] - roomType, roomSpace os."
 void showRooms(const vector<Room>& rooms) {
 	// list rooms with prices
 	for (Room tempRoom : rooms) {
@@ -103,6 +115,7 @@ void showRooms(const vector<Room>& rooms) {
 	}
 }
 
+// show already booked days for specific room
 void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 
 	bool empty = true;
@@ -113,7 +126,7 @@ void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 
 		if(tempOrder.getRoomId() == roomID) {
 
-			ss << counter << ". " << tempOrder.getDate() << "\n";
+			ss << counter << ". " << tempOrder.getDate() << " " << tempOrder.getTimeFrame() << "\n";
 
 			if(empty)
 				empty = false;
@@ -212,7 +225,7 @@ int main() {
 			tempOrderDetails.push_back(s.substr(0, pos));
 			s.erase(0, pos + delimiter_2.length());
 		}
-		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), tempOrderDetails[2]));
+		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), tempOrderDetails[2], tempOrderDetails[3], stoi(tempOrderDetails[4])));
 		tempOrderDetails.clear();
 	}
 
@@ -248,6 +261,9 @@ int main() {
 				string startTime;
 				string orderDate;
 
+				/*
+				 * TODO: Old stuff, may be deleted
+				 *
 				// get date in format yyyy-mm-dd
 				time_t t = time(0);
 				tm* now = localtime(&t);
@@ -256,6 +272,7 @@ int main() {
 				tempStream << (now->tm_year + 1900) << "-" << (now->tm_mon + 1) << "-" << now->tm_mday;
 
 				string formattedDate = tempStream.str();
+				*/
 
 				cout << "Choose which room you would like to order:" << endl;
 				cout << endl;
@@ -288,9 +305,14 @@ int main() {
 
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
-				cout << "Enter date to book a room [YYYY-M(M)-D(D)]: ";
+				cout << "Enter date to book a room [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
 				cin.ignore();
 				getline(cin, orderDate);
+
+				// handle going back to the main menu
+				if(stoi(orderDate) == 0)
+					continue;
+
 				cout << endl;
 
 				// debug
@@ -303,7 +325,7 @@ int main() {
 				while(cin.fail() || !regex_match(orderDate, date_match)) {
 
 					cout << endl;
-					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D)]: ";
+					cout << "Invalid date format, please enter date in format [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
 
 					getline(cin, orderDate);
 
@@ -311,19 +333,64 @@ int main() {
 					cout << orderDate << endl;
 				}
 
+				// handle going back to main menu
+				if(stoi(orderDate) == 0)
+					continue;
+
 				// get start hour
 				cout << endl;
-				cout << "At what time would you like to book a room? (8 - 16) [:00, :15, :30, :45]: ";
+				cout << "At what time would you like to book a room? (8 - 16) [:00, :15, :30, :45] (0 -> go back to Main Menu): ";
 				cin >> startTime;
+
+				// handle going back to main menu
+				if(stoi(startTime) == 0)
+					continue;
 
 				regex startTime_match("([8-9]|[1][0-6]):([0][0]|[1][5]|[3][0]|[4][5])");
 
 				while(cin.fail() || !regex_match(startTime, startTime_match)) {
 
 					cout << endl;
-					cout << "Invalid hour format, please try again: ";
+					cout << "Invalid hour format, please try again: (0 -> go back to Main Menu)";
 					cin >> startTime;
 				}
+
+				// handle going back to main menu
+				if(stoi(startTime) == 0)
+					continue;
+
+
+				// check if this room is available for booking at this time
+				/*
+				for(Order tempOrder : orders) {
+
+					if(tempOrder.getRoomId() == choosedRoom && tempOrder.getDate() == orderDate) {
+
+						// check hours..
+						string timeFrame;
+
+						string startTime;
+						string endTime;
+
+						string startHour;
+						string startMinutes;
+						string endHour;
+						string endMinutes;
+
+						string timeFrame_delimiter_1 = " ";
+						string timeFrame_delimiter_2 = "-";
+						string hour_delimiter = ":";
+
+						pos = tempOrder.getDate().find(timeFrame_delimiter_1);
+						timeFrame = tempOrder.getDate().substr(pos + 1, tempOrder.getDate().length());
+
+						pos = timeFrame.find(timeFrame_delimiter_2);
+						startTime
+
+
+
+					}
+				}*/
 
 
 				// get duration of booking
@@ -340,14 +407,18 @@ int main() {
 				cout << "5. Custom length" << endl;
 
 				cout << endl;
-				cout << "Your choice: ";
+				cout << "Your choice (0 -> go back to Main Menu): ";
 				cin >> choosedRoom;
 
-				while(cin.fail() || choosedRoom > 5 || choosedRoom == 0) {
+				while(cin.fail() || choosedRoom > 5) {
 
-					cout << "You choosed incorrectly, please try again: ";
+					cout << "You choosed incorrectly, please try again (0 -> go back to Main Menu): ";
 					cin >> choosedRoom;
 				}
+
+				// handle going back to maun menu
+				if(choosedRoom == 0)
+					continue;
 
 
 				unsigned int bookingLength;
@@ -372,6 +443,8 @@ int main() {
 						cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]): ";
 						cin >> bookingLength;
 
+						// TODO: Free of 2 while loops?
+
 						while(cin.fail() || bookingLength < 30 || bookingLength > 480 || bookingLength % 30 != 0) {
 
 							cout << endl;
@@ -385,15 +458,37 @@ int main() {
 
 				// merge start hour with duration
 				string hour_delimiter = ":";
-				int tempHour;
-				int tempMinutes;
+				unsigned int tempHour;
+				unsigned int tempMinutes;
 
 				// extract hour and minutes
 				pos = startTime.find(hour_delimiter);
 				tempHour = stoi(startTime.substr(0, pos));
 				tempMinutes = stoi(startTime.substr(pos + hour_delimiter.length(), startTime.length()));
 
-				int totalMinutes = (tempHour * 60) + tempMinutes;
+				// convert total minutes to actual time frame
+				unsigned int totalMinutes = (tempHour * 60) + tempMinutes;
+
+				unsigned int finalHour = (totalMinutes + bookingLength) / 60;
+				unsigned int finalMinutes = (totalMinutes + bookingLength) % 60;
+
+
+				// check avail of the room
+				bool check = true;
+				for(Order tempOrder : orders) {
+
+					check = tempOrder.checkAvail(rooms, choosedRoom, orderDate, startTime, bookingLength);
+
+					if(!check) {
+
+						cout << "NOT AVAILABLE" << endl;
+						break;
+					}
+				}
+
+				//debug
+				cout << "Time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
+
 
 				cout << "========================================" << endl;
 				cout << "ORDER SUMMARY" << endl;
