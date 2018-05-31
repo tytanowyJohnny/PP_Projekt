@@ -233,6 +233,9 @@ int main() {
 
 	// start loop, makes it possible to go back
 	while(true) {
+
+		label_2: // user choosed 0 at bookingLength menu and wanted to go back to Main Menu
+
 		//show MainMenu
 		choosedOption = showMainMenu();
 
@@ -258,6 +261,7 @@ int main() {
 			{
 				// vars
 				unsigned int choosedRoom;
+				unsigned int bookingLength;
 				string startTime;
 				string orderDate;
 
@@ -299,13 +303,15 @@ int main() {
 				if(choosedRoom == 0) // handle going back to main menu
 					continue;
 
+				label_1: // label to come back if room is not available at choosed time and date
+
 				// show already booked dates for choosed room
 				cout << endl;
 				showRoomAvail(choosedRoom, orders);
 
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
-				cout << "Enter date to book a room [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
+				cout << "Enter date to book this room [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
 				cin.ignore();
 				getline(cin, orderDate);
 
@@ -351,13 +357,13 @@ int main() {
 				while(cin.fail() || !regex_match(startTime, startTime_match)) {
 
 					cout << endl;
-					cout << "Invalid hour format, please try again: (0 -> go back to Main Menu)";
+					cout << "Invalid hour format, please try again (0 -> go back to Main Menu): ";
 					cin >> startTime;
-				}
 
-				// handle going back to main menu
-				if(stoi(startTime) == 0)
-					continue;
+					// go back to the Main Menu
+					if(startTime == 0)
+						goto label_2;
+				}
 
 
 				// check if this room is available for booking at this time
@@ -408,22 +414,19 @@ int main() {
 
 				cout << endl;
 				cout << "Your choice (0 -> go back to Main Menu): ";
-				cin >> choosedRoom;
+				cin >> bookingLength;
 
-				while(cin.fail() || choosedRoom > 5) {
+				while(cin.fail() || bookingLength > 5) {
 
 					cout << "You choosed incorrectly, please try again (0 -> go back to Main Menu): ";
-					cin >> choosedRoom;
+					cin >> bookingLength;
 				}
 
 				// handle going back to maun menu
-				if(choosedRoom == 0)
+				if(bookingLength == 0)
 					continue;
 
-
-				unsigned int bookingLength;
-
-				switch(choosedRoom) {
+				switch(bookingLength) {
 
 					case 1:
 						bookingLength = 30;
@@ -440,16 +443,21 @@ int main() {
 					case 5:
 					{
 						cout << endl;
-						cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]): ";
+						cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]) (0 -> go back to Main Menu): ";
 						cin >> bookingLength;
 
-						// TODO: Free of 2 while loops?
+						//handle going back to Main Menu
+						if(bookingLength == 0)
+							continue;
 
 						while(cin.fail() || bookingLength < 30 || bookingLength > 480 || bookingLength % 30 != 0) {
 
 							cout << endl;
-							cout << "Incorrect value, please try again: ";
+							cout << "Incorrect value, please try again (0 -> go back to Main Menu): ";
 							cin >> bookingLength;
+
+							if(bookingLength == 0)
+								goto label_2;
 						}
 						break;
 					}
@@ -481,8 +489,8 @@ int main() {
 
 					if(!check) {
 
-						cout << "NOT AVAILABLE" << endl;
-						break;
+						cout << "This room is not available at this time, please try again." << endl;
+						goto label_1;
 					}
 				}
 
