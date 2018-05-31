@@ -17,7 +17,7 @@
 
 #include "Room.h"
 #include "Order.h"
-
+#include "Payment.h"
 
 using namespace std;
 
@@ -143,6 +143,98 @@ void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 		cout << ss.str() << endl;
 	}
 }
+
+
+
+int showPaymentMenu () {
+
+	int selectedOption;
+
+	// Main menu for this component
+	cout << endl;
+	cout << "How would you like to pay?" << endl;
+	cout << "1. Use my credit card (master card only)" << endl;
+	cout << "2. Use transfer" << endl;
+	cout << "3. Cancel Order" << endl;
+	cout << endl;
+	cout << "Your choice (1-3): ";
+
+	// Save user choice (must input correct option)
+	cin >> selectedOption;
+
+	// check if correct value
+	while(cin.fail() || selectedOption > 3 || selectedOption < 1) {
+
+		// if not, clear cin
+		cin.clear();
+		cin.ignore(256, '\n');
+		cout << "You need to select from available options." << endl;
+		cout << "Please choose number from 1 to 3: ";
+		cin >> selectedOption;
+	}
+
+	return selectedOption;
+}
+
+
+Payment payByTransfer (double price, string transferTitle) {
+	cout << "========================================" << endl;
+	cout << "TRANSFER DETAILS" << endl;
+	cout << "Account number: 86 10202498 1111222233334444" << endl;
+	cout << "Amount to pay" << price << endl;
+	cout << "Transfer title" << transferTitle << endl;
+	cout << "========================================" << endl;
+
+	cout << endl;
+
+	return Payment(Transfer, price);
+}
+
+
+Payment payByCreditCard (double price) {
+	string cardNumber;
+	string cvc;
+
+	cout << "Amount to pay: " << price << endl;
+	cout << "Put your card number please: ";
+	cin >> cardNumber;
+
+	regex number_match("^5[1-5]\\d{14}$");
+
+	// handle invalid input
+	while(cin.fail() || !regex_match(cardNumber, number_match)) {
+
+		cout << endl;
+		cout << "Invalid card number, try again: ";
+
+		cin >> cardNumber;
+
+	}
+
+
+	cout << "Enter CVC code: ";
+	regex cvc_match("^[0-9]{3}$");
+
+	// handle invalid input
+	while(cin.fail() || !regex_match(cvc, cvc_match)) {
+
+		cout << endl;
+		cout << "Invalid CVC, try again: ";
+
+		cin >> cvc;
+	}
+
+
+	cout << "Thank you for your payment!" << endl;
+
+
+	return Payment(CreditCard, price);
+}
+
+void showPaymentHistory () {
+
+}
+
 /*
  * GENERAL FUNCTION
  */
@@ -154,12 +246,13 @@ int main() {
 
 	vector<Room> rooms; // vector for storing rooms data
 	vector<Order> orders; // vector for strong orders data
+	vector<Payment> payments;
 
 
 	// display header
 	cout << "----------------------------------------------------------------" << endl;
 	cout << "Conference Room Manager ver. 0.1" << endl;
-	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek" << endl;
+	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek/Beata Brymerska" << endl;
 	cout << "----------------------------------------------------------------" << endl;
 
 	cout << endl;
@@ -487,7 +580,7 @@ int main() {
 				}
 
 				//debug
-				cout << "Time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
+				// cout << "Time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
 
 
 				cout << "========================================" << endl;
@@ -495,6 +588,42 @@ int main() {
 				cout << "========================================" << endl;
 
 				cout << endl;
+
+
+				int orderSummarySelectedOption;
+				cout << "Press 0 to cancel booking or 1 to continue to payment" << endl;
+				cin >> orderSummarySelectedOption;
+
+				while(cin.fail() || orderSummarySelectedOption < 0 || orderSummarySelectedOption > 1) {
+					cout << endl;
+					cout << "Incorrect value, please try again: ";
+					cin >> orderSummarySelectedOption;
+				}
+
+				if (orderSummarySelectedOption == 0) {
+					continue;
+				}
+
+				int paymentSelectedOption = showPaymentMenu();
+				int price = bookingLength * 50.0;
+
+				switch (paymentSelectedOption) {
+					case 1:
+						payments.push_back(payByCreditCard(price));
+						break;
+
+					case 2:
+						payments.push_back(payByTransfer(price, "Name Surname - room booking"));
+						break;
+
+					case 0:
+						continue;
+				}
+
+
+
+				cout << endl;
+
 
 				// TODO: When creating vectors, push new item at position set by its ID from file
 
