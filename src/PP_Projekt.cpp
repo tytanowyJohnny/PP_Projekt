@@ -358,19 +358,6 @@ int main() {
 				string startTime;
 				string orderDate;
 
-				/*
-				 * TODO: Old stuff, may be deleted
-				 *
-				// get date in format yyyy-mm-dd
-				time_t t = time(0);
-				tm* now = localtime(&t);
-
-				stringstream tempStream;
-				tempStream << (now->tm_year + 1900) << "-" << (now->tm_mon + 1) << "-" << now->tm_mday;
-
-				string formattedDate = tempStream.str();
-				*/
-
 				cout << "Choose which room you would like to order:" << endl;
 				cout << endl;
 
@@ -428,13 +415,13 @@ int main() {
 
 					getline(cin, orderDate);
 
+					// handle going back to main menu
+					if(stoi(orderDate) == 0)
+						goto label_2;
+
 					//debug
 					cout << orderDate << endl;
 				}
-
-				// handle going back to main menu
-				if(stoi(orderDate) == 0)
-					continue;
 
 				// get start hour
 				cout << endl;
@@ -454,43 +441,9 @@ int main() {
 					cin >> startTime;
 
 					// go back to the Main Menu
-					if(startTime == 0)
+					if(stoi(startTime) == 0)
 						goto label_2;
 				}
-
-
-				// check if this room is available for booking at this time
-				/*
-				for(Order tempOrder : orders) {
-
-					if(tempOrder.getRoomId() == choosedRoom && tempOrder.getDate() == orderDate) {
-
-						// check hours..
-						string timeFrame;
-
-						string startTime;
-						string endTime;
-
-						string startHour;
-						string startMinutes;
-						string endHour;
-						string endMinutes;
-
-						string timeFrame_delimiter_1 = " ";
-						string timeFrame_delimiter_2 = "-";
-						string hour_delimiter = ":";
-
-						pos = tempOrder.getDate().find(timeFrame_delimiter_1);
-						timeFrame = tempOrder.getDate().substr(pos + 1, tempOrder.getDate().length());
-
-						pos = timeFrame.find(timeFrame_delimiter_2);
-						startTime
-
-
-
-					}
-				}*/
-
 
 				// get duration of booking
 				cout << endl;
@@ -586,9 +539,6 @@ int main() {
 						goto label_1;
 					}
 				}
-
-				//debug
-				// cout << "Time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
 
 
 				cout << "========================================" << endl;
