@@ -115,6 +115,33 @@ void showRooms(const vector<Room>& rooms) {
 	}
 }
 
+//show only your booked rooms
+void yourRooms(const vector<Room>& rooms){
+
+}
+//show menu for "manage my rooms"
+int ManageMyRooms(){
+	int chosenOption;
+		// menu for case 3
+		cout << endl;
+		cout << "What do you want to do?" << endl;
+		cout << "1. Delete one of my orders" << endl;
+		cout << "2. Edit my orders" << endl;
+		cout << "3. Add new one" << endl;
+		cout << endl;
+		cout << "Your choice (1-3): ";
+		// Save user choice (1-3)
+		cin >> chosenOption;
+		// check if correct value
+		while(cin.fail() || chosenOption > 3 || chosenOption < 1) {
+			cin.clear();
+			cin.ignore(256, '\n');
+			cout << "You need to select from available options." << endl;
+			cout << "Please choose number from 1 to 3: ";
+			cin >> chosenOption;
+		}
+		return chosenOption;
+}
 // show already booked days for specific room
 void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 
@@ -243,7 +270,7 @@ int main() {
 
 	// Variables
 	int choosedOption; // stores option choosed from main menu
-
+	int chosenOption; // stores option choosed from manage menu
 	vector<Room> rooms; // vector for storing rooms data
 	vector<Order> orders; // vector for strong orders data
 	vector<Payment> payments;
@@ -468,7 +495,7 @@ int main() {
 					cin >> bookingLength;
 				}
 
-				// handle going back to maun menu
+				// handle going back to main menu
 				if(bookingLength == 0)
 					continue;
 
@@ -588,7 +615,14 @@ int main() {
 				break;
 			}
 			case 3:
+			{
+					chosenOption = ManageMyRooms();
+					cout << chosenOption;
+					if(chosenOption == 1){
+						cout << "Dziala";
+					}
 				break;
+			}
 			default:
 				break;
 		}
