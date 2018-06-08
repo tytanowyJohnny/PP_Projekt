@@ -1,1 +1,1 @@
-1,0,Sala Testowa,200,100,;2,1,Druga Sala Testowa,500,250,;
+1,0,Sala Testowa,200,100,;2,1,Druga Sala Testowa,500,250,;2,1,Druga Sala Testowa,500,250,;2,1,Druga Sala Testowa,500,250,;
