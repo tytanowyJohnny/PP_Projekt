@@ -18,6 +18,7 @@
 #include "Room.h"
 #include "Order.h"
 #include "Payment.h"
+#include "User.h"
 
 using namespace std;
 
@@ -99,6 +100,25 @@ string loadOrdersFile() {
 	return buffer;
 }
 
+
+// load users data
+string loadUsersFile() {
+
+	fstream usersFile;
+	string buffer;
+
+
+	usersFile.open("users.txt");
+
+	if(usersFile.is_open()) {
+
+		buffer.assign( (istreambuf_iterator<char>(usersFile) ), (istreambuf_iterator<char>()));
+	}
+
+	usersFile.close();
+
+	return buffer;
+}
 
 /*
  * Other/helper functions
@@ -204,6 +224,182 @@ int showPaymentMenu () {
 }
 
 
+
+int Register(vector<User> users){
+	unsigned int userID;
+	string inputLogin;
+	string inputPassword;
+	string inputFullName;
+	string inputFirstName;
+	string inputLastName;
+	string inputPhoneNumber;
+	string inputMailAddress;
+	int tryOrback;
+	bool registerIncomplete = true;
+
+	while(registerIncomplete){
+
+		cout <<endl;
+		cout << "Please enter your Login:"<<endl;
+		cin >> inputLogin;
+
+		cout << "Please enter your password:"<<endl;
+		cin >> inputPassword;
+
+		cout << "Please enter your first name:"<<endl;
+		cin >> inputFirstName;
+
+		cout << "Please enter your last name:"<<endl;
+		cin >> inputLastName;
+		inputFullName += inputFirstName;
+		inputFullName += " ";
+		inputFullName += inputLastName;
+
+		cout << "Please enter your phone number:"<<endl;
+		cin >> inputPhoneNumber;
+
+		cout << "Please enter your @ address:"<<endl;
+		cin >> inputMailAddress;
+
+		cout <<"If the data is correct?"<<endl;
+		cout <<"Login: "<< inputLogin<<endl;
+		cout <<"Password: "<< inputPassword<<endl;
+		cout <<"Full name: " <<inputFullName<<endl;
+		cout <<"Phone number: "<< inputPhoneNumber<<endl;
+		cout <<"Mail Address: " << inputMailAddress<<endl;
+		cout <<endl;
+		cout <<"Yes, go to Main Menu. 	 (Press 1)"<<endl;
+		cout <<"No, enter again.         (Press 2)"<<endl;
+		cout <<"Go back to Welcome Menu. (Press 0)"<<endl;
+		cin >> tryOrback;
+		// check if correct value
+							while(cin.fail() || tryOrback > 2 || tryOrback < 0) {
+
+								// if not, clear cin
+								cin.clear();
+								cin.ignore(256, '\n');
+								cout << "You need to select from available options." << endl;
+								cout << "Please choose number from 0 to 2: ";
+								cin >> tryOrback;
+							}
+
+		if (tryOrback==1){
+			registerIncomplete=false;
+			userID=users.size();
+
+				fstream usersFile;
+
+				usersFile.open("users.txt", ios::app);
+				usersFile <<userID<<","<<inputLogin<<","<<inputPassword<<","<<inputFullName<<","<<inputPhoneNumber<<","<<inputMailAddress<<";";
+
+				usersFile.close();
+		}
+
+		else if (tryOrback==2){
+
+			cout<<"Please enter the data again."<<endl;
+			inputFullName.clear();
+		}
+
+		else if (tryOrback==0){
+			userID=0;
+			break;}
+	}
+
+	return userID;
+}
+
+int LogIn (vector<User> users){
+	unsigned int userID;
+	string inputLogin;
+	string inputPassword;
+	bool loginFailed = true;
+	int tryOrback;
+
+while(loginFailed){
+
+	cout<<endl;
+	cout << "Please enter your Login:"<<endl;
+	cin >> inputLogin;
+
+	cout << "Please enter your password:"<<endl;
+	cin >> inputPassword;
+
+
+	for (int i =0; i<=users.size()-1; i++){
+
+		if ((users[i].userLogin==inputLogin) && (users[i].userPassword==inputPassword)){
+			cout<<"Access granted. Welcome "<<users[i].getUserFullName()<<endl;
+			userID=users[i].getUserId();
+			loginFailed = false;
+			break;
+		}
+		else if (i==users.size()-1){
+			cout << "Login or password incorrect! "<<endl;
+			cout<<	"Press 1 to try again or 0 to go back."<<endl;
+			cin >> tryOrback;
+
+			if (tryOrback==1)
+				break;
+
+			else{
+			// check if correct value
+					while(cin.fail() || tryOrback > 1 || tryOrback < 0) {
+
+						// if not, clear cin
+						cin.clear();
+						cin.ignore(256, '\n');
+						cout << "You need to select from available options." << endl;
+						cout << "Please choose number from 0 to 1: ";
+						cin >> tryOrback;
+					}
+
+			}
+		}
+
+	}
+	if (tryOrback==0){
+		userID=0;
+		break;}
+}
+return userID;
+}
+
+int showWelcomeMenu () {
+	int loginOption;
+
+	//Welcome information
+
+	cout<<endl;
+	cout<<"Welcome information..."<<endl;
+	cout<<"----------------------------------------------------------------"<<endl;
+
+	// Main menu for this component
+
+	cout<<"Choose options to continue..."<<endl;
+	cout<<"1. Log in"<<endl;
+	cout<<"2. New customer? Create your account!"<<endl;
+	cout<<"3. Continue as Guest"<<endl;
+	cout << endl;
+	cout << "Your choice (1-3): ";
+
+	// Save user choice (must input correct option)
+	cin >> loginOption;
+	// check if correct value
+		while(cin.fail() || loginOption > 3 || loginOption < 1) {
+
+			// if not, clear cin
+			cin.clear();
+			cin.ignore(256, '\n');
+			cout << "You need to select from available options." << endl;
+			cout << "Please choose number from 1 to 3: ";
+			cin >> loginOption;
+		}
+
+		return loginOption;
+}
+
+
 Payment payByTransfer (double price, string transferTitle) {
 	cout << "========================================" << endl;
 	cout << "TRANSFER DETAILS" << endl;
@@ -271,9 +467,13 @@ int main() {
 	// Variables
 	int choosedOption; // stores option choosed from main menu
 	int chosenOption; // stores option choosed from manage menu
+	int loginOption; //  stores option choosed from welcome menu
 	vector<Room> rooms; // vector for storing rooms data
 	vector<Order> orders; // vector for strong orders data
 	vector<Payment> payments;
+	vector<User> users; //  vector for storing users data
+	int userID;
+	int returnFlag;
 
 
 	// display header
@@ -284,14 +484,52 @@ int main() {
 
 	cout << endl;
 
+
 	// load all data from files
 	string roomsData = loadRoomsFile();
 	string ordersData = loadOrdersFile();
+	string usersData = loadUsersFile();
+
 
 	// setup delimiters
 	const string delimiter_1 = ";";
 	const string delimiter_2 = ",";
 	size_t pos = 0;
+
+		/**
+		 * users.txt to vectors
+		 */
+
+		// used to store tokens
+		vector<string> userTokens;
+
+		// explode string loaded from file into separate objects in vector
+		while((pos = usersData.find(delimiter_1)) != string::npos) {
+
+			userTokens.push_back(usersData.substr(0, pos));
+			usersData.erase(0, pos + delimiter_1.length());
+		}
+
+		// used to store single room details
+
+		vector<string> tempUserDetails;
+
+		for(string s : userTokens) {
+
+			while((pos = s.find(delimiter_2)) != string::npos) {
+
+				tempUserDetails.push_back(s.substr(0, pos));
+				s.erase(0, pos + delimiter_2.length());
+			}
+			users.push_back(User(stoi(tempUserDetails[0]), tempUserDetails[1], tempUserDetails[2], tempUserDetails[3], tempUserDetails[4], tempUserDetails[5]));
+			tempUserDetails.clear();
+		}
+
+
+
+
+
+
 
 	/**
 	 * rooms.txt to vectors
@@ -320,6 +558,9 @@ int main() {
 		rooms.push_back(Room(stoi(tempRoomDetails[0]), stoi(tempRoomDetails[1]), tempRoomDetails[2], stoi(tempRoomDetails[3]), stoi(tempRoomDetails[4])));
 		tempRoomDetails.clear();
 	}
+
+
+
 
 	/**
 	 * orders.txt to vectors
@@ -350,6 +591,48 @@ int main() {
 	}
 
 
+	while(true){
+
+		//show WelcomeMenu
+
+
+		loginOption = showWelcomeMenu();
+		returnFlag = 1;
+
+		switch (loginOption){
+
+		case 1:
+		{
+			userID = LogIn(users);
+			if (userID > 0){
+				returnFlag=0;}
+			break;
+		}
+		case 2:
+		{
+			userID = Register(users);
+			if (userID > 0){
+				returnFlag=0;
+						}
+			break;
+		}
+		case 3:
+		{
+			userID = 0;
+			returnFlag=0;
+			cout << "----------------------------------------------------------------" << endl;
+			cout<<"Welcome to the Guest Zone!"<<endl;
+			cout << "----------------------------------------------------------------" << endl;
+			break;
+		}
+
+		}
+
+		if (returnFlag==0){
+				break;}
+
+
+	}
 
 	// start loop, makes it possible to go back
 	while(true) {
@@ -358,6 +641,7 @@ int main() {
 
 		//show MainMenu
 		choosedOption = showMainMenu();
+
 
 		//handle choosedOption
 		switch(choosedOption) {
