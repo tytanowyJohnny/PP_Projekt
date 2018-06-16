@@ -816,6 +816,8 @@ int main() {
 				showRoomAvail(choosedRoom, orders);
 
 
+				label_date:
+
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
 				cout << "Enter date to book this room [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
@@ -849,6 +851,31 @@ int main() {
 					if(stoi(orderDate) == 0)
 						goto label_2;
 
+				}
+
+				// check if valid date (not before today)
+				string tempDate[3]; // 0 - year, 1 - month, 2 - day
+
+				time_t t = time(0); // time now
+				tm* now = localtime(&t);
+
+				pos = 0;
+				int i = 0;
+				string delimiter_3 = "-";
+
+				while((pos = orderDate.find(delimiter_3)) != string::npos) {
+
+					tempDate[i] = orderDate.substr(0, pos);
+					orderDate.erase(0, pos + delimiter_3.length());
+					i++;
+				}
+
+				tempDate[2] = orderDate;
+
+				if((now->tm_year + 1900) > stoi(tempDate[0]) || (stoi(tempDate[0]) >= (now->tm_year + 1900) && stoi(tempDate[1]) < (now->tm_mon + 1)) || (stoi(tempDate[1]) == (now->tm_mon + 1) && stoi(tempDate[2]) < now->tm_mday)) {
+
+					cout << "You are not allowed to book date in the past!" << endl;
+					goto label_date;
 				}
 
 				// get start hour
