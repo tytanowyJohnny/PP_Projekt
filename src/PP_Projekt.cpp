@@ -992,7 +992,9 @@ int main() {
 				}
 
 				int paymentSelectedOption = showPaymentMenu();
-				int price = bookingLength * 50.0;
+
+
+				int price = (bookingLength / 10) * rooms.at(choosedRoom).getRoomCost;
 
 				// update file
 
@@ -1335,7 +1337,7 @@ int main() {
 
 								updateOrders(orders);
 
-								cout << "You order has been chaned!" << endl;
+								cout << "You order has been changed!" << endl;
 
 								goto label_2; // go back to main menu
 
