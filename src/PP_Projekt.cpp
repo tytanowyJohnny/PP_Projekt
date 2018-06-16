@@ -460,6 +460,22 @@ void showPaymentHistory () {
 
 }
 
+void saveOrder(vector<Order> orders, int ordersCounter) {
+	/*
+	 * write to orders.txt
+	 */
+	fstream ordersFile;
+	stringstream buffer;
+	ordersFile.open("orders.txt", ios::app);
+	ordersFile << orders.at(ordersCounter).getOrderId() << ","
+			<< orders.at(ordersCounter).getUserId() << ","
+			<< orders.at(ordersCounter).getRoomId() << ","
+			<< orders.at(ordersCounter).getDate() << ","
+			<< orders.at(ordersCounter).getStartHour() << ","
+			<< orders.at(ordersCounter).getDuration() << ";";
+	ordersFile.close();
+}
+
 /*
  * GENERAL FUNCTION
  */
@@ -467,9 +483,9 @@ void showPaymentHistory () {
 int main() {
 
 	// Variables
-	int choosedOption; // stores option choosed from main menu
-	int chosenOption; // stores option choosed from manage menu
-	int loginOption; //  stores option choosed from welcome menu
+	unsigned int choosedOption; // stores option choosed from main menu
+	unsigned int chosenOption; // stores option choosed from manage menu
+	unsigned int loginOption; //  stores option choosed from welcome menu
 	vector<Room> rooms; // vector for storing rooms data
 	vector<Order> orders; // vector for strong orders data
 	vector<Payment> payments;
@@ -477,6 +493,8 @@ int main() {
 	int userID;
 	int returnFlag;
 	HANDLE hOut;
+	int roomsCounter = -1;
+	int ordersCounter = -1; // 0 is first element in vector
 
 	// setup handler
 	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -564,6 +582,7 @@ int main() {
 		}
 		rooms.push_back(Room(stoi(tempRoomDetails[0]), stoi(tempRoomDetails[1]), tempRoomDetails[2], stoi(tempRoomDetails[3]), stoi(tempRoomDetails[4])));
 		tempRoomDetails.clear();
+		roomsCounter++;
 	}
 
 
@@ -595,6 +614,7 @@ int main() {
 		}
 		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), stoi(tempOrderDetails[2]), tempOrderDetails[3], tempOrderDetails[4], stoi(tempOrderDetails[5])));
 		tempOrderDetails.clear();
+		ordersCounter++;
 	}
 
 
@@ -884,6 +904,15 @@ int main() {
 
 				cout << endl;
 
+				// add new order to existing orders vector
+				orders.push_back(Order(ordersCounter + 1, userID, choosedRoom, orderDate, startTime, bookingLength));
+				ordersCounter++;
+
+				/*
+				 * write to orders.txt
+				 */
+
+				saveOrder(orders, ordersCounter);
 
 				int orderSummarySelectedOption;
 				cout << "Press 0 to cancel booking or 1 to continue to payment" << endl;
@@ -902,6 +931,8 @@ int main() {
 				int paymentSelectedOption = showPaymentMenu();
 				int price = bookingLength * 50.0;
 
+				// update file
+
 				switch (paymentSelectedOption) {
 					case 1:
 						payments.push_back(payByCreditCard(price));
@@ -914,9 +945,6 @@ int main() {
 					case 0:
 						continue;
 				}
-
-
-
 
 
 				cout << endl;
