@@ -477,11 +477,9 @@ int main() {
 	int userID;
 	int returnFlag;
 	HANDLE hOut;
-	HANDLE hIn;
 
 	// setup handler
 	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	hIn = GetStdHandle(STD_INPUT_HANDLE);
 
 	SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
 
@@ -595,7 +593,7 @@ int main() {
 			tempOrderDetails.push_back(s.substr(0, pos));
 			s.erase(0, pos + delimiter_2.length());
 		}
-		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), tempOrderDetails[2], tempOrderDetails[3], stoi(tempOrderDetails[4])));
+		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), stoi(tempOrderDetails[2]), tempOrderDetails[3], tempOrderDetails[4], stoi(tempOrderDetails[5])));
 		tempOrderDetails.clear();
 	}
 
@@ -751,8 +749,6 @@ int main() {
 					if(stoi(orderDate) == 0)
 						goto label_2;
 
-					//debug
-					cout << orderDate << endl;
 				}
 
 				// get start hour
@@ -879,6 +875,15 @@ int main() {
 
 				cout << endl;
 
+				// order summary
+				cout << "Room type: " << rooms.at(choosedRoom).getRoomType() << endl;
+				cout << "Room size: " << rooms.at(choosedRoom).getRoomSpace() << endl;
+				cout << "Room cost: " << rooms.at(choosedRoom).getRoomCost() << endl;
+				cout << "Booking date: " << orderDate << endl;
+				cout << "Booking time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
+
+				cout << endl;
+
 
 				int orderSummarySelectedOption;
 				cout << "Press 0 to cancel booking or 1 to continue to payment" << endl;
@@ -909,6 +914,8 @@ int main() {
 					case 0:
 						continue;
 				}
+
+
 
 
 

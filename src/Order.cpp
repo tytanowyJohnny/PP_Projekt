@@ -14,8 +14,9 @@
 
 namespace std {
 
-Order::Order(unsigned int orderId, unsigned int roomId, string date, string startHour, unsigned int duration) {
+Order::Order(unsigned int orderId, unsigned int userID, unsigned int roomId, string date, string startHour, unsigned int duration) {
 
+	this->userID = userID;
 	this->orderId = orderId;
 	this->roomId = roomId;
 	this->startHour = startHour;
@@ -80,10 +81,6 @@ bool Order::checkAvail(vector<Room> rooms, unsigned int bookRoom, string bookDat
 	sT_startMinutes = (sT_hour * 60) + sT_minutes;
 	sT_totalMinutes = sT_startMinutes + bookDuration;
 
-	// debug:
-	cout << "sT_startMinutes: " << sT_startMinutes << endl;
-	cout << "sT_totalMinutes: " << sT_totalMinutes << endl;
-
 	// for startHour
 	pos = startHour.find(delimiter_1);
 	sH_hour = stoi(startHour.substr(0, pos));
@@ -135,6 +132,10 @@ const string& Order::getStartHour() const {
 
 void Order::setStartHour(const string& startHour) {
 	this->startHour = startHour;
+}
+
+unsigned int Order::getUserId() const {
+	return userID;
 }
 
 } /* namespace std */

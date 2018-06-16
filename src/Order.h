@@ -17,7 +17,7 @@ namespace std {
 class Order {
 public:
 	// constructors
-	Order(unsigned int orderId, unsigned int roomId, string date, string startHour, unsigned int duration);
+	Order(unsigned int orderId, unsigned int userID, unsigned int roomId, string date, string startHour, unsigned int duration);
 	virtual ~Order();
 	unsigned int getOrderId() const;
 	void setOrderId(unsigned int orderId);
@@ -32,6 +32,7 @@ public:
 	bool checkAvail(vector<Room> rooms, unsigned int bookRoom, string bookDate, string startTime, unsigned int duration);
 	const string getTimeFrame() const;
 	static unsigned int getOrderQty();
+	unsigned int getUserId() const;
 
 	//const string toString() const;
 
@@ -39,6 +40,7 @@ private:
 	// variables
 	unsigned int orderId;
 	unsigned int roomId;
+	unsigned int userID;
 	string startHour;
 	string date;
 	unsigned int duration;
