@@ -24,6 +24,11 @@
 
 using namespace std;
 
+
+/*
+ *  Bartosz Kubacki
+ */
+
 // Functions
 
 /**
@@ -103,6 +108,10 @@ string loadOrdersFile() {
 	return buffer;
 }
 
+/*
+ * Micha³ Grzyb
+ */
+
 
 // load users data
 string loadUsersFile() {
@@ -123,6 +132,11 @@ string loadUsersFile() {
 	return buffer;
 }
 
+
+/*
+ * Bartosz Kubacki
+ */
+
 /*
  * Other/helper functions
  */
@@ -137,6 +151,10 @@ void showRooms(const vector<Room>& rooms) {
 				<< " os." << endl;
 	}
 }
+
+/*
+ * Brt³omiej Urbanek
+ */
 
 //show only your booked rooms
 void yourRooms(const vector<Room>& rooms){
@@ -164,6 +182,10 @@ int ManageMyRooms(){
 		}
 		return chosenOption;
 }
+
+/*
+ * Bartosz Kubacki
+ */
 // show already booked days for specific room
 void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 
@@ -193,6 +215,9 @@ void showRoomAvail(unsigned int roomID, vector<Order>& orders) {
 	}
 }
 
+/*
+ * Beata Brymerska
+ */
 
 
 int showPaymentMenu () {
@@ -225,7 +250,9 @@ int showPaymentMenu () {
 	return selectedOption;
 }
 
-
+/*
+ * Micha³ Grzyb
+ */
 
 int Register(vector<User> users){
 	unsigned int userID;
@@ -401,6 +428,10 @@ int showWelcomeMenu () {
 		return loginOption;
 }
 
+/*
+ * Beata Brymerska
+ */
+
 
 Payment payByTransfer (double price, string transferTitle) {
 	cout << "========================================" << endl;
@@ -460,6 +491,9 @@ void showPaymentHistory () {
 
 }
 
+/*
+ * Bartosz Kubacki
+ */
 void saveOrder(vector<Order> orders, int ordersCounter) {
 	/*
 	 * write to orders.txt
@@ -527,7 +561,7 @@ int main() {
 	// display header
 	cout << "----------------------------------------------------------------" << endl;
 	cout << "Conference Room Manager ver. 0.1" << endl;
-	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek/Beata Brymerska" << endl;
+	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek/Beata Brymerska/Grzegorz Fidelus" << endl;
 	cout << "----------------------------------------------------------------" << endl;
 
 
@@ -544,6 +578,10 @@ int main() {
 	const string delimiter_1 = ";";
 	const string delimiter_2 = ",";
 	size_t pos = 0;
+
+	/*
+	 * Micha³ Grzyb
+	 */
 
 	/**
 	 * users.txt to vectors
@@ -575,6 +613,10 @@ int main() {
 		users.push_back(User(stoi(tempUserDetails[0]), tempUserDetails[1], tempUserDetails[2], tempUserDetails[3], tempUserDetails[4], tempUserDetails[5]));
 		tempUserDetails.clear();
 	}
+
+	/*
+	 * Bartosz Kubacki
+	 */
 
 
 
@@ -639,6 +681,10 @@ int main() {
 		ordersCounter++;
 	}
 
+	/*
+	 * Micha³ Grzyb
+	 */
+
 
 	while(true){
 
@@ -682,6 +728,10 @@ int main() {
 
 
 	}
+
+	/*
+	 * Bartosz Kubacki / Bart³miej Urbanek
+	 */
 
 	// start loop, makes it possible to go back
 	while(true) {
@@ -977,6 +1027,10 @@ int main() {
 
 				saveOrder(orders, ordersCounter);
 
+
+				/*
+				 * Beata Brymerska
+				 */
 				int orderSummarySelectedOption;
 				cout << "Press 0 to cancel booking or 1 to continue to payment" << endl;
 				cin >> orderSummarySelectedOption;
@@ -994,7 +1048,7 @@ int main() {
 				int paymentSelectedOption = showPaymentMenu();
 
 
-				int price = (bookingLength / 10) * rooms.at(choosedRoom).getRoomCost;
+				int price = (bookingLength / 60) * rooms.at(choosedRoom).getRoomCost();
 
 				// update file
 
@@ -1016,6 +1070,11 @@ int main() {
 
 				break;
 			}
+
+			/*
+			 * Grzegorz Fidelus
+			 */
+
 			case 3:
 			{
 
