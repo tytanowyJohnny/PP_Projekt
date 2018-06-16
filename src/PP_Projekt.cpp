@@ -40,20 +40,21 @@ int showMainMenu() {
 	cout << "1. Check actual prices" << endl;
 	cout << "2. Book a conference room" << endl;
 	cout << "3. Manage my orders" << endl;
+	cout << "4. Go back to login page" << endl;
 	cout << endl;
-	cout << "Your choice (1-3): ";
+	cout << "Your choice (1-4): ";
 
 	// Save user choice (must input correct option)
 	cin >> choosedOption;
 
 	// check if correct value
-	while(cin.fail() || choosedOption > 3 || choosedOption < 1) {
+	while(cin.fail() || choosedOption > 4 || choosedOption < 1) {
 
 		// if not, clear cin
 		cin.clear();
 		cin.ignore(256, '\n');
 		cout << "You need to select from available options." << endl;
-		cout << "Please choose number from 1 to 3: ";
+		cout << "Please choose number from 1 to 4: ";
 		cin >> choosedOption;
 	}
 
@@ -147,19 +148,18 @@ int ManageMyRooms(){
 		// menu for case 3
 		cout << endl;
 		cout << "What do you want to do?" << endl;
-		cout << "1. Delete one of my orders" << endl;
-		cout << "2. Edit my orders" << endl;
-		cout << "3. Add new one" << endl;
+		cout << "1. Edit my orders" << endl;
+		cout << "2. Add new one" << endl;
 		cout << endl;
-		cout << "Your choice (1-3): ";
+		cout << "Your choice (1-2): ";
 		// Save user choice (1-3)
 		cin >> chosenOption;
 		// check if correct value
-		while(cin.fail() || chosenOption > 3 || chosenOption < 1) {
+		while(cin.fail() || chosenOption > 2 || chosenOption < 1) {
 			cin.clear();
 			cin.ignore(256, '\n');
 			cout << "You need to select from available options." << endl;
-			cout << "Please choose number from 1 to 3: ";
+			cout << "Please choose number from 1 to 2: ";
 			cin >> chosenOption;
 		}
 		return chosenOption;
@@ -476,6 +476,26 @@ void saveOrder(vector<Order> orders, int ordersCounter) {
 	ordersFile.close();
 }
 
+void updateOrders(const vector<Order>& orders) {
+
+	remove("orders.txt");
+
+
+	ofstream ordersFile("orders.txt");
+
+	for (Order tempOrder : orders) {
+
+		ordersFile << tempOrder.getOrderId() << "," << tempOrder.getRoomId()
+				<< "," << tempOrder.getUserId() << "," << tempOrder.getDate()
+				<< "," << tempOrder.getStartHour() << ","
+				<< tempOrder.getDuration() << ",;";
+
+	}
+
+	ordersFile.close();
+
+}
+
 /*
  * GENERAL FUNCTION
  */
@@ -492,14 +512,11 @@ int main() {
 	vector<User> users; //  vector for storing users data
 	int userID;
 	int returnFlag;
-	HANDLE hOut;
 	int roomsCounter = -1;
 	int ordersCounter = -1; // 0 is first element in vector
 
 	// setup handler
-	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
 
 	// display header
 	cout << "----------------------------------------------------------------" << endl;
@@ -507,7 +524,6 @@ int main() {
 	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek/Beata Brymerska" << endl;
 	cout << "----------------------------------------------------------------" << endl;
 
-	SetConsoleTextAttribute(hOut, 15); // default color
 
 	cout << endl;
 
@@ -622,7 +638,7 @@ int main() {
 
 		//show WelcomeMenu
 
-
+		label_login:
 		loginOption = showWelcomeMenu();
 		returnFlag = 1;
 
@@ -679,7 +695,6 @@ int main() {
 				auto temp_time = chrono::system_clock::now();
 				time_t actual_time = chrono::system_clock::to_time_t(temp_time);
 
-				SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
 
 				cout << "Room prices for: " << ctime(&actual_time) << endl;
 				cout << endl;
@@ -687,19 +702,27 @@ int main() {
 				// list rooms with prices
 				showRooms(rooms);
 
-				SetConsoleTextAttribute(hOut, 15); // default color
 
 				break;
 			}
 			case 2:
 			{
+
+				// check if guest
+				if(userID == 0) {
+
+					cout << "You are not allowed to create new order while being a guest! Please login or create an account." << endl;
+					goto label_login;
+				}
+
+				label_start:
+
 				// vars
 				unsigned int choosedRoom;
 				unsigned int bookingLength;
 				string startTime;
 				string orderDate;
 
-				SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
 
 				cout << "Choose which room you would like to order:" << endl;
 				cout << endl;
@@ -707,7 +730,6 @@ int main() {
 				// shows all rooms with already ordered dates
 				showRooms(rooms);
 
-				SetConsoleTextAttribute(hOut, 14); // yellow color
 
 				cout << endl;
 				cout << "Your choice (press 0 to go back): ";
@@ -953,12 +975,301 @@ int main() {
 			}
 			case 3:
 			{
-					chosenOption = ManageMyRooms();
-					cout << chosenOption;
-					if(chosenOption == 1){
-						cout << "Dziala";
+
+				// check if guest
+				if(userID == 0) {
+
+					cout << "You are not allowed to manage orders while being a guest! Please login or create an account." << endl;
+					goto label_login;
+				}
+
+				chosenOption = ManageMyRooms();
+
+				switch(chosenOption) {
+
+					case 1: // edit
+						{
+							// vars
+							unsigned int choice;
+							unsigned int choosedOrder;
+							unsigned int ordersCount = 0;
+							string newStartTime;
+							unsigned int newBookingLength;
+
+							// show your orders
+							cout << "Your orders:" << endl;
+
+							for(Order tempOrder : orders) {
+
+								if(tempOrder.getUserId() == userID) {
+
+									cout << tempOrder.getOrderId() << ". " << tempOrder.getDate() << " -> " << tempOrder.getTimeFrame() << endl;
+									ordersCount++;
+								}
+							}
+
+							cout << "Which order you would like to edit? (0 - go back to Main Menu): ";
+							cin >> choosedOrder;
+
+
+							while(cin.fail() || choosedOrder > ordersCount) { // risky check
+
+								cin.clear();
+								cin.ignore(256, '\n');
+								cout << "Invalid option, please try again (0 - go back to Main Menu): ";
+								cin >> choosedOrder;
+
+								if(choosedOrder == 0)
+									continue;
+							}
+
+							label_manage:
+
+
+							cout << "What would you like to change in selected order?" << endl;
+							cout << "1. Booking time" << endl;
+							cout << "2. Booking length" << endl;
+							cout << "3. Add a comment" << endl;
+							cout << endl;
+							cout << "Your choice (1-3) (0 - go back to Main Menu): ";
+							cin >> choice;
+
+							while(cin.fail() || choice > 3) {
+
+								cin.clear();
+								cin.ignore(256, '\n');
+								cout << "Invalid option, please try again (0 - go back to Main Menu): ";
+								cin >> choice;
+							}
+
+
+							switch(choice) {
+
+								case 1:
+								{
+									// get start hour
+									cout << endl;
+									cout << "At what time would you like to book a room? (8 - 16) [:00, :15, :30, :45] (0 -> go back to Main Menu): ";
+									cin >> newStartTime;
+
+									// handle going back to main menu
+									if(stoi(newStartTime) == 0)
+									continue;
+
+									regex startTime_match("([8-9]|[1][0-6]):([0][0]|[1][5]|[3][0]|[4][5])");
+
+									while(cin.fail() || !regex_match(newStartTime, startTime_match)) {
+
+									cout << endl;
+									cout << "Invalid hour format, please try again (0 -> go back to Main Menu): ";
+									cin >> newStartTime;
+
+									// go back to the Main Menu
+									if(stoi(newStartTime) == 0)
+										goto label_2;
+									}
+
+									// get duration of booking
+									cout << endl;
+
+									cout << "Choose for how long you would like to book this room:" << endl;
+
+									cout << endl;
+
+									cout << "1. 30 minutes" << endl;
+									cout << "2. 1 hour (60 minutes)" << endl;
+									cout << "3. 1 hour 30 minutes (90 minutes)" << endl;
+									cout << "4. 2 hours (120 minutes)" << endl;
+									cout << "5. Custom length" << endl;
+
+									cout << endl;
+									cout << "Your choice (0 -> go back to Main Menu): ";
+									cin >> newBookingLength;
+
+									while(cin.fail() || newBookingLength > 5) {
+
+										cout << "You choosed incorrectly, please try again (0 -> go back to Main Menu): ";
+										cin >> newBookingLength;
+									}
+
+									// handle going back to main menu
+									if(newBookingLength == 0)
+										continue;
+
+									switch(newBookingLength) {
+
+										case 1:
+											newBookingLength = 30;
+											break;
+										case 2:
+											newBookingLength = 60;
+											break;
+										case 3:
+											newBookingLength = 90;
+											break;
+										case 4:
+											newBookingLength = 120;
+											break;
+										case 5:
+										{
+											cout << endl;
+											cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]) (0 -> go back to Main Menu): ";
+											cin >> newBookingLength;
+
+											//handle going back to Main Menu
+											if(newBookingLength == 0)
+												continue;
+
+											while(cin.fail() || newBookingLength < 30 || newBookingLength > 480 || newBookingLength % 30 != 0) {
+
+												cout << endl;
+												cout << "Incorrect value, please try again (0 -> go back to Main Menu): ";
+												cin >> newBookingLength;
+
+												if(newBookingLength == 0)
+													goto label_2;
+											}
+											break;
+										}
+
+
+								}
+
+								// check if available time
+								// check avail of the room
+								bool check = true;
+								for(Order tempOrder : orders) {
+
+									check = tempOrder.checkAvail(rooms, orders.at(choosedOrder).getRoomId(), orders.at(choosedOrder).getDate(), newStartTime, newBookingLength);
+
+									if(!check) {
+
+										cout << "This room is not available at this time, please try again." << endl;
+										goto label_manage;
+									}
+								}
+
+								// edit order in vector
+								orders.at(choosedOrder - 1).setStartHour(newStartTime);
+								orders.at(choosedOrder - 1).setDuration(newBookingLength);
+
+
+								updateOrders(orders);
+
+								cout << "Your order has been changed!" << endl;
+
+
+
+								break;
+								}
+
+							case 2:
+							{
+									unsigned int newBookingLength;
+
+									cout << "Choose for how long you would like to book this room:" << endl;
+
+									cout << endl;
+
+									cout << "1. 30 minutes" << endl;
+									cout << "2. 1 hour (60 minutes)" << endl;
+									cout << "3. 1 hour 30 minutes (90 minutes)" << endl;
+									cout << "4. 2 hours (120 minutes)" << endl;
+									cout << "5. Custom length" << endl;
+
+									cout << endl;
+									cout << "Your choice (0 -> go back to Main Menu): ";
+									cin >> newBookingLength;
+
+									while(cin.fail() || newBookingLength > 5) {
+
+										cout << "You choosed incorrectly, please try again (0 -> go back to Main Menu): ";
+										cin >> newBookingLength;
+									}
+
+									// handle going back to main menu
+									if(newBookingLength == 0)
+										continue;
+
+									switch(newBookingLength) {
+
+									case 1:
+										newBookingLength = 30;
+										break;
+									case 2:
+										newBookingLength = 60;
+										break;
+									case 3:
+										newBookingLength = 90;
+										break;
+									case 4:
+										newBookingLength = 120;
+										break;
+									case 5:
+									{
+										cout << endl;
+										cout << "Enter booking length in minutes (a multiply of 30, [30 - 480]) (0 -> go back to Main Menu): ";
+										cin >> newBookingLength;
+
+										//handle going back to Main Menu
+										if(newBookingLength == 0)
+											continue;
+
+										while(cin.fail() || newBookingLength < 30 || newBookingLength > 480 || newBookingLength % 30 != 0) {
+
+											cout << endl;
+											cout << "Incorrect value, please try again (0 -> go back to Main Menu): ";
+											cin >> newBookingLength;
+
+											if(newBookingLength == 0)
+												goto label_2;
+										}
+										break;
+									}
+
+
+									}
+
+									// check if available time
+									// check avail of the room
+									bool check = true;
+									for(Order tempOrder : orders) {
+
+										check = tempOrder.checkAvail(rooms, orders.at(choosedOrder).getRoomId(), orders.at(choosedOrder).getDate(), orders.at(choosedOrder).getStartHour(), newBookingLength);
+
+										if(!check) {
+
+											cout << "This room is not available at this time, please try again." << endl;
+											goto label_manage;
+										}
+									}
+
+									// edit order in vector
+									orders.at(choosedOrder - 1).setDuration(newBookingLength);
+
+									updateOrders(orders);
+
+									cout << "Your order has been changed!" << endl;
+							}
+
+						}
 					}
+
+					case 2: // new one
+
+						goto label_start; // go to new order menu
+
+					default:
+						cout << "Ooops!" << endl;
+
+				}
+
 				break;
+			}
+			case 4:
+			{
+				//Go back main menu
+				goto label_login;
 			}
 			default:
 				break;
