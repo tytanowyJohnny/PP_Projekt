@@ -14,7 +14,7 @@
 
 namespace std {
 
-Order::Order(unsigned int orderId, unsigned int userID, unsigned int roomId, string date, string startHour, unsigned int duration) {
+Order::Order(unsigned int orderId, unsigned int userID, unsigned int roomId, string date, string startHour, unsigned int duration, string comment) {
 
 	this->userID = userID;
 	this->orderId = orderId;
@@ -22,6 +22,7 @@ Order::Order(unsigned int orderId, unsigned int userID, unsigned int roomId, str
 	this->startHour = startHour;
 	this->duration = duration;
 	this->date = date;
+	this->comment = comment;
 
 }
 
@@ -146,4 +147,12 @@ unsigned int std::Order::getDuration() const {
 
 void std::Order::setDuration(unsigned int duration) {
 	this->duration = duration;
+}
+
+const string& std::Order::getComment() const {
+	return comment;
+}
+
+void std::Order::setComment(const string& comment) {
+	this->comment = comment;
 }

@@ -465,14 +465,19 @@ void saveOrder(vector<Order> orders, int ordersCounter) {
 	 * write to orders.txt
 	 */
 	fstream ordersFile;
+
 	stringstream buffer;
+
 	ordersFile.open("orders.txt", ios::app);
+
 	ordersFile << orders.at(ordersCounter).getOrderId() << ","
 			<< orders.at(ordersCounter).getUserId() << ","
 			<< orders.at(ordersCounter).getRoomId() << ","
 			<< orders.at(ordersCounter).getDate() << ","
 			<< orders.at(ordersCounter).getStartHour() << ","
-			<< orders.at(ordersCounter).getDuration() << ";";
+			<< orders.at(ordersCounter).getDuration() << ","
+			<< orders.at(ordersCounter).getComment() << ",;";
+
 	ordersFile.close();
 }
 
@@ -514,6 +519,7 @@ int main() {
 	int returnFlag;
 	int roomsCounter = -1;
 	int ordersCounter = -1; // 0 is first element in vector
+	string orderComment;
 
 	// setup handler
 
@@ -628,7 +634,7 @@ int main() {
 			tempOrderDetails.push_back(s.substr(0, pos));
 			s.erase(0, pos + delimiter_2.length());
 		}
-		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), stoi(tempOrderDetails[2]), tempOrderDetails[3], tempOrderDetails[4], stoi(tempOrderDetails[5])));
+		orders.push_back(Order(stoi(tempOrderDetails[0]), stoi(tempOrderDetails[1]), stoi(tempOrderDetails[2]), tempOrderDetails[3], tempOrderDetails[4], stoi(tempOrderDetails[5]), tempOrderDetails[6]));
 		tempOrderDetails.clear();
 		ordersCounter++;
 	}
@@ -722,6 +728,8 @@ int main() {
 				unsigned int bookingLength;
 				string startTime;
 				string orderDate;
+
+				cout << endl;
 
 
 				cout << "Choose which room you would like to order:" << endl;
@@ -880,6 +888,39 @@ int main() {
 
 				}
 
+				cout << endl;
+
+				cout << "Insert some comment for out staff! (0 - go back to Main Menu): ";
+				cin.ignore();
+				getline(cin, orderComment);
+
+				// handle going back to the main menu / invalid input
+				try {
+					if(stoi(orderComment) == 0)
+						continue;
+				}
+				catch(exception& e) {
+
+					//// do nothing
+				}
+
+				// handle invalid input
+				while(cin.fail()) {
+
+					cout << endl;
+					cout << "Invalid comment, please try again (0 -> go back to Main Menu): ";
+
+					getline(cin, orderComment);
+
+					// handle going back to main menu
+					if(stoi(orderComment) == 0)
+						goto label_2;
+
+				}
+
+				cout << endl;
+
+
 				// merge start hour with duration
 				string hour_delimiter = ":";
 				unsigned int tempHour;
@@ -918,16 +959,16 @@ int main() {
 				cout << endl;
 
 				// order summary
-				cout << "Room type: " << rooms.at(choosedRoom).getRoomType() << endl;
-				cout << "Room size: " << rooms.at(choosedRoom).getRoomSpace() << endl;
-				cout << "Room cost: " << rooms.at(choosedRoom).getRoomCost() << endl;
+				cout << "Room type: " << rooms.at(choosedRoom - 1).getRoomType() << endl;
+				cout << "Room size: " << rooms.at(choosedRoom - 1).getRoomSpace() << endl;
+				cout << "Room cost: " << rooms.at(choosedRoom - 1).getRoomCost() << endl;
 				cout << "Booking date: " << orderDate << endl;
 				cout << "Booking time frame: " << startTime << " - " << finalHour << ":" << finalMinutes << endl;
 
 				cout << endl;
 
 				// add new order to existing orders vector
-				orders.push_back(Order(ordersCounter + 1, userID, choosedRoom, orderDate, startTime, bookingLength));
+				orders.push_back(Order(ordersCounter + 1, userID, choosedRoom, orderDate, startTime, bookingLength, orderComment));
 				ordersCounter++;
 
 				/*
@@ -1003,12 +1044,12 @@ int main() {
 
 								if(tempOrder.getUserId() == userID) {
 
-									cout << tempOrder.getOrderId() << ". " << tempOrder.getDate() << " -> " << tempOrder.getTimeFrame() << endl;
+									cout << tempOrder.getOrderId() << ". " << tempOrder.getDate() << " -> " << tempOrder.getTimeFrame() << " Komentarz: " << tempOrder.getComment() << endl;
 									ordersCount++;
 								}
 							}
 
-							cout << "Which order you would like to edit? (0 - go back to Main Menu): ";
+							cout << "Which order you would like to edit? (0 - go back to Manage Order Menu): ";
 							cin >> choosedOrder;
 
 
@@ -1020,7 +1061,7 @@ int main() {
 								cin >> choosedOrder;
 
 								if(choosedOrder == 0)
-									continue;
+									goto label_2;
 							}
 
 							label_manage:
@@ -1029,7 +1070,7 @@ int main() {
 							cout << "What would you like to change in selected order?" << endl;
 							cout << "1. Booking time" << endl;
 							cout << "2. Booking length" << endl;
-							cout << "3. Add a comment" << endl;
+							cout << "3. Edit comment" << endl;
 							cout << endl;
 							cout << "Your choice (1-3) (0 - go back to Main Menu): ";
 							cin >> choice;
@@ -1040,6 +1081,9 @@ int main() {
 								cin.ignore(256, '\n');
 								cout << "Invalid option, please try again (0 - go back to Main Menu): ";
 								cin >> choice;
+
+								if(choice == 0)
+									goto label_2;
 							}
 
 
@@ -1054,7 +1098,7 @@ int main() {
 
 									// handle going back to main menu
 									if(stoi(newStartTime) == 0)
-									continue;
+										goto label_2;
 
 									regex startTime_match("([8-9]|[1][0-6]):([0][0]|[1][5]|[3][0]|[4][5])");
 
@@ -1094,7 +1138,7 @@ int main() {
 
 									// handle going back to main menu
 									if(newBookingLength == 0)
-										continue;
+										goto label_2;
 
 									switch(newBookingLength) {
 
@@ -1118,7 +1162,7 @@ int main() {
 
 											//handle going back to Main Menu
 											if(newBookingLength == 0)
-												continue;
+												goto label_2;
 
 											while(cin.fail() || newBookingLength < 30 || newBookingLength > 480 || newBookingLength % 30 != 0) {
 
@@ -1158,7 +1202,7 @@ int main() {
 
 								cout << "Your order has been changed!" << endl;
 
-
+								goto label_2; // go back to main menu
 
 								break;
 								}
@@ -1213,7 +1257,7 @@ int main() {
 
 										//handle going back to Main Menu
 										if(newBookingLength == 0)
-											continue;
+											goto label_2;
 
 										while(cin.fail() || newBookingLength < 30 || newBookingLength > 480 || newBookingLength % 30 != 0) {
 
@@ -1250,8 +1294,52 @@ int main() {
 									updateOrders(orders);
 
 									cout << "Your order has been changed!" << endl;
+
+									goto label_2; // go back to main menu
 							}
 
+							case 3:
+							{
+
+								string newComment;
+
+								cout << "Enter new comment which should be added to this order: ";
+								cin.ignore();
+								getline(cin, newComment);
+
+								// handle going back to the main menu / invalid input
+								try {
+									if(stoi(newComment) == 0)
+										goto label_2;
+								}
+								catch(exception& e) {
+
+									//// do nothing
+								}
+
+								// handle invalid input
+								while(cin.fail()) {
+
+									cout << endl;
+									cout << "Invalid comment, please try again (0 -> go back to Main Menu): ";
+
+									getline(cin, newComment);
+
+									// handle going back to main menu
+									if(stoi(newComment) == 0)
+										goto label_2;
+
+								}
+
+								orders.at(choosedOrder - 1).setComment(newComment);
+
+								updateOrders(orders);
+
+								cout << "You order has been chaned!" << endl;
+
+								goto label_2; // go back to main menu
+
+							}
 						}
 					}
 
