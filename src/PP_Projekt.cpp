@@ -14,6 +14,8 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include <windows.h>
+#include <cstdlib>
 
 #include "Room.h"
 #include "Order.h"
@@ -474,13 +476,22 @@ int main() {
 	vector<User> users; //  vector for storing users data
 	int userID;
 	int returnFlag;
+	HANDLE hOut;
+	HANDLE hIn;
 
+	// setup handler
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	hIn = GetStdHandle(STD_INPUT_HANDLE);
+
+	SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
 
 	// display header
 	cout << "----------------------------------------------------------------" << endl;
 	cout << "Conference Room Manager ver. 0.1" << endl;
 	cout << "Component 1/4, Bartosz Kubacki/Bartlomiej Urbanek/Beata Brymerska" << endl;
 	cout << "----------------------------------------------------------------" << endl;
+
+	SetConsoleTextAttribute(hOut, 15); // default color
 
 	cout << endl;
 
@@ -496,38 +507,36 @@ int main() {
 	const string delimiter_2 = ",";
 	size_t pos = 0;
 
-		/**
-		 * users.txt to vectors
-		 */
+	/**
+	 * users.txt to vectors
+	 */
 
-		// used to store tokens
-		vector<string> userTokens;
+	// used to store tokens
+	vector<string> userTokens;
 
-		// explode string loaded from file into separate objects in vector
-		while((pos = usersData.find(delimiter_1)) != string::npos) {
+	// explode string loaded from file into separate objects in vector
+	while((pos = usersData.find(delimiter_1)) != string::npos) {
 
-			userTokens.push_back(usersData.substr(0, pos));
-			usersData.erase(0, pos + delimiter_1.length());
+		userTokens.push_back(usersData.substr(0, pos));
+		usersData.erase(0, pos + delimiter_1.length());
+	}
+
+	// used to store single user details
+
+	vector<string> tempUserDetails;
+
+	for(string s : userTokens) {
+
+		while((pos = s.find(delimiter_2)) != string::npos) {
+
+		tempUserDetails.push_back(s.substr(0, pos));
+		s.erase(0, pos + delimiter_2.length());
+
 		}
 
-		// used to store single room details
-
-		vector<string> tempUserDetails;
-
-		for(string s : userTokens) {
-
-			while((pos = s.find(delimiter_2)) != string::npos) {
-
-				tempUserDetails.push_back(s.substr(0, pos));
-				s.erase(0, pos + delimiter_2.length());
-			}
-			users.push_back(User(stoi(tempUserDetails[0]), tempUserDetails[1], tempUserDetails[2], tempUserDetails[3], tempUserDetails[4], tempUserDetails[5]));
-			tempUserDetails.clear();
-		}
-
-
-
-
+		users.push_back(User(stoi(tempUserDetails[0]), tempUserDetails[1], tempUserDetails[2], tempUserDetails[3], tempUserDetails[4], tempUserDetails[5]));
+		tempUserDetails.clear();
+	}
 
 
 
@@ -652,12 +661,15 @@ int main() {
 				auto temp_time = chrono::system_clock::now();
 				time_t actual_time = chrono::system_clock::to_time_t(temp_time);
 
-				cout << "--------------------------------------------------" << endl;
+				SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
+
 				cout << "Room prices for: " << ctime(&actual_time) << endl;
-				cout << "--------------------------------------------------" << endl;
+				cout << endl;
 
 				// list rooms with prices
 				showRooms(rooms);
+
+				SetConsoleTextAttribute(hOut, 15); // default color
 
 				break;
 			}
@@ -669,14 +681,19 @@ int main() {
 				string startTime;
 				string orderDate;
 
+				SetConsoleTextAttribute(hOut, FOREGROUND_GREEN); // green color
+
 				cout << "Choose which room you would like to order:" << endl;
 				cout << endl;
 
 				// shows all rooms with already ordered dates
 				showRooms(rooms);
 
+				SetConsoleTextAttribute(hOut, 14); // yellow color
+
 				cout << endl;
 				cout << "Your choice (press 0 to go back): ";
+
 				cin >> choosedRoom; // save choice
 
 				// check if correct value
@@ -700,20 +717,24 @@ int main() {
 				cout << endl;
 				showRoomAvail(choosedRoom, orders);
 
+
 				// get date from user, format: yyyy-m-dd hh:mm
 				cout << endl;
 				cout << "Enter date to book this room [YYYY-M(M)-D(D)] (0 -> go back to Main Menu): ";
 				cin.ignore();
 				getline(cin, orderDate);
 
-				// handle going back to the main menu
-				if(stoi(orderDate) == 0)
-					continue;
+				// handle going back to the main menu / invalid input
+				try {
+					if(stoi(orderDate) == 0)
+						continue;
+				}
+				catch(exception& e) {
+
+					//// do nothing
+				}
 
 				cout << endl;
-
-				// debug
-				cout << orderDate << endl;
 
 				// setup regex
 				regex date_match("[2][0][1][8-9]-([1][0-2]|[1-9])-([1-9]|[1-2][0-9]|[3][0-1])");
@@ -892,9 +913,6 @@ int main() {
 
 
 				cout << endl;
-
-
-				// TODO: When creating vectors, push new item at position set by its ID from file
 
 				break;
 			}

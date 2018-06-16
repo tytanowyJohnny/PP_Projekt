@@ -31,6 +31,8 @@ public:
 	void setStartHour(const string& startHour);
 	bool checkAvail(vector<Room> rooms, unsigned int bookRoom, string bookDate, string startTime, unsigned int duration);
 	const string getTimeFrame() const;
+	static unsigned int getOrderQty();
+
 	//const string toString() const;
 
 private:

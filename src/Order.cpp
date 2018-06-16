@@ -25,7 +25,7 @@ Order::Order(unsigned int orderId, unsigned int roomId, string date, string star
 }
 
 Order::~Order() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /*
@@ -90,10 +90,6 @@ bool Order::checkAvail(vector<Room> rooms, unsigned int bookRoom, string bookDat
 	sH_minutes = stoi(startHour.substr(pos + delimiter_1.length(), startHour.length()));
 	sH_startMinutes = (sH_hour * 60) + sH_minutes;
 	sH_totalMinutes = sH_startMinutes + duration;
-
-	// debug
-	cout << "sH_startMinutes: " << sH_startMinutes << endl;
-	cout << "sH_totalMinutes: " << sH_totalMinutes << endl;
 
 	for(Room tempRoom : rooms) {
 

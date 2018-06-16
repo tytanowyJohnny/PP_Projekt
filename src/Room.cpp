@@ -10,7 +10,6 @@
 #include <string>
 #include <sstream>
 
-
 Room::Room(unsigned int roomID, unsigned int roomType, string roomName, unsigned int roomSpace, unsigned int roomCost) {
 
 	this->roomID = roomID;
@@ -22,7 +21,7 @@ Room::Room(unsigned int roomID, unsigned int roomType, string roomName, unsigned
 }
 
 Room::~Room() {
-	// TODO Auto-generated destructor stub
+
 }
 
 const string Room::toString() const {
@@ -73,6 +72,10 @@ const string Room::getRoomType() const {
 		return "Sala konferencyjna";
 	case 1:
 		return "Sala komputerowa";
+	case 2:
+		return "Sala wyk³adowa";
+	case 3:
+		return "Sala bankietowa";
 	default:
 		return "oops!";
 	}

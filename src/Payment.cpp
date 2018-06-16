@@ -55,6 +55,6 @@ string Payment::getPaymentSummary () {
 }
 
 Payment::~Payment() {
-	// TODO Auto-generated destructor stub
+
 }
 

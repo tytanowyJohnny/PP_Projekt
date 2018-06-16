@@ -30,6 +30,7 @@ public:
 	const string getRoomType() const;
 	void setRoomType(unsigned int roomType);
 	const string toString() const;
+	static unsigned int getRoomQty();
 
 private:
 	// variables
